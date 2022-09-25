@@ -237,4 +237,4 @@ if __name__ == '__main__':
 
     app.run(host=server_config['host'],
             port=server_config['port'],
-            debug=True)
+            debug=False)

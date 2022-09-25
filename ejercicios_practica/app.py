@@ -50,19 +50,34 @@ def personas():
         # limit = ...
         # offset = ....
 
+        limit_str = str(request.args.get('limit'))
+        offset_str = str(request.args.get('offset'))
+
+        limit = 0
+        offset = 0
+
         # Debe verificar si el limit y offset son válidos cuando
         # no son especificados en la URL
 
+        if(limit_str is not None) and (limit_str.isdigit()):
+            limit = int(limit_str)
+
+        if(offset_str is not None) and (offset_str.isdigit()):
+            offset = int(offset_str)
+
+
+
+
         # Alumno: Pasarle al metodo report los valores de limit y offset
-        data = persona.report()
+        data = persona.report(limit=limit, offset=offset)
         
-        result = '''<h3>Alumno: Implementar la llamada
-                    al HTML tabla.html
-                    con render_template, recuerde pasar
-                    data como parámetro</h3>'''
+        #result = '''<h3>Alumno: Implementar la llamada
+        #            al HTML tabla.html
+        #            con render_template, recuerde pasar
+        #            data como parámetro</h3>'''
         # Sacar esta linea cuando haya implementado el return
         # con render template
-        return result
+        return render_template('tabla.html', data=data)
     except:
         return jsonify({'trace': traceback.format_exc()})
 
@@ -78,16 +93,25 @@ def registro():
 
     if request.method == 'POST':
         try:
-            name = ""
-            age = 0
+            name = str(request.form.get('name')).lower()
+            age = str(request.form.get('age'))
 
-            return "Alumno --> Realice la implementacion y borre este return"
+            if(name is None or age is None or age.isdigit() is False):
+                # Datos ingresados incorrectos
+                    return Response(status=400)
+            
+            persona.insert(name, int(age))
+
+            # Como respuesta al POST devolvemos la tabla de valores
+            return redirect(url_for('personas'))
+
+            #return "Alumno --> Realice la implementacion y borre este return"
 
             # Alumno:
             # Obtener del HTTP POST JSON el nombre y la edad
             # name = ...
             # age = ...
-
+            
             # Alumno: descomentar la linea persona.insert una vez implementado
             # lo anterior:
             # persona.insert(name, int(age))
@@ -115,11 +139,11 @@ def comparativa():
 
         # Descomentar luego de haber implementado su función en persona.py:
 
-        # x, y = persona.dashboard()
-        # image_html = utils.graficar(x, y)
-        # return Response(image_html.getvalue(), mimetype='image/png')
+        x, y = persona.dashboard()
+        image_html = utils.graficar(x, y)
+        return Response(image_html.getvalue(), mimetype='image/png')
 
-        return "Alumno --> Realice la implementacion"
+        #return "Alumno --> Realice la implementacion"
     except:
         return jsonify({'trace': traceback.format_exc()})
 
@@ -137,4 +161,5 @@ if __name__ == '__main__':
     print('Inove@Server start!')
 
     # Lanzar server
-    app.run(host="127.0.0.1", port=5000)
+    #app.run(host="127.0.0.1", port=5000)
+    app.run(host="192.168.0.46", port=5000)
